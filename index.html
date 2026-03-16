@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shopee Cashback</title>
+    <link rel="icon" type="image/jpeg" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f2f2f7; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 500px; }
+        .header-container { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 25px; width: 100%; }
+        .logo-main { width: 60px; height: 60px; border-radius: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); object-fit: cover; }
+        .header-container h2 { color: #ee4d2d; margin: 0; font-size: 22px; font-weight: 800; text-align: left; line-height: 1.1; }
+        .input-box { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.04); }
+        .input-actions { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 12px; }
+        .btn-small { border: none; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-paste { background: #e3f2fd; color: #1976d2; }
+        .btn-clear { background: #f5f5f7; color: #8e8e93; }
+        textarea { width: 100%; height: 110px; border: 1px solid #efeff4; border-radius: 16px; padding: 15px; font-size: 16px; outline: none; resize: none; background: #fafafa; font-family: inherit; transition: border 0.3s; }
+        textarea:focus { border-color: #ee4d2d; background: #fff; }
+        
+
+        .subid-input { width: 100%; padding: 12px 16px; border: 1px solid #efeff4; border-radius: 12px; font-size: 14px; margin-top: 10px; outline: none; background: #fafafa; font-family: inherit; }
+        .subid-input:focus { border-color: #ee4d2d; background: #fff; }
+
+        .primary-btn { width: 100%; background: #ee4d2d; color: white; border: none; padding: 18px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(238, 77, 45, 0.25); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .primary-btn:disabled { opacity: 0.7; }
+        
+
+        .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #productList { width: 100%; max-width: 500px; margin-top: 25px; display: flex; flex-direction: column; gap: 15px; }
+        .notif-card { background: #ffffff; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 15px; border-top: 5px solid #ee4d2d; box-shadow: 0 10px 30px rgba(0,0,0,0.06); animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .result-header { display: flex; gap: 18px; width: 100%; align-items: flex-start; }
+        .product-img { width: 120px; height: 120px; border-radius: 14px; object-fit: cover; border: 1px solid #f0f0f0; background: #f9f9f9; flex-shrink: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .product-info { flex: 1; text-align: left; display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+        .product-name { font-size: 15px; font-weight: 700; color: #1c1c1e; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .notif-status { font-size: 13px; font-weight: 600; color: #34c759; display: flex; align-items: center; gap: 4px; }
+        
+
+        .btn-group { display: flex; gap: 12px; width: 100%; align-items: center; }
+        .btn-action { text-decoration: none; padding: 14px 5px; border-radius: 14px; font-size: 14px; font-weight: 800; text-align: center; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        .btn-buy { flex: 2; background: #ee4d2d; color: white !important; font-size: 15px; } 
+        .btn-copy { flex: 1; background: #f2f2f7; color: #ed4d2d; font-size: 12px; } 
+        .btn-copy.copied { background: #34c759; color: white; transform: scale(1.03); }
+        
+        .contact-section { width: 100%; max-width: 500px; margin-top: 30px; text-align: center; }
+        .btn-zalo { display: block; width: 100%; background: #0068ff; color: white !important; text-decoration: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15); }
+        .btn-zalo.btn-help { background: #ffffff; color: #0068ff !important; border: 1.5px solid #0068ff; }
+        footer { margin-top: auto; padding: 40px 20px; text-align: center; width: 100%; max-width: 500px; }
+        .copyright { font-size: 13px; color: #a1a1a6; line-height: 1.6; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-container">
+            <img src="logo.png" alt="Logo" class="logo-main" id="logoAdmin" style="cursor:pointer">
+            <h2>ĐỔI LINK HOÀN TIỀN<br>HOA HỒNG SHOPEE</h2>
+        </div>
+        <div class="input-box">
+            <div class="input-actions">
+                <button class="btn-small btn-paste" onclick="pasteFromClipboard()">📋 Dán link</button>
+                <button class="btn-small btn-clear" onclick="clearInput()">✕ Xóa</button>
+            </div>
+            <textarea id="inputText" placeholder="Dán link Shopee vào đây và nhấn chuyển đổi ngay..."></textarea>
+            <input type="text" id="subIdInput" class="subid-input" placeholder="Điền Sub ID (nếu chưa có mã Sub ID thì liên hệ mình nhé)">
+            <button class="primary-btn" onclick="processText()" id="btnConvert">
+                <span class="spinner" id="loadingSpinner"></span>
+                <span id="btnText">CHUYỂN ĐỔI NGAY</span>
+            </button>
+        </div>
+    </div>
+    <div id="productList"></div>
+
+    <script>
+        async function pasteFromClipboard() { try { const t = await navigator.clipboard.readText(); if(t) document.getElementById('inputText').value = t; } catch(e) {} }
+        function clearInput() { document.getElementById('inputText').value = ''; document.getElementById('productList').innerHTML = ''; }
+        function copyToClipboard(url, btn) {
+            navigator.clipboard.writeText(url).then(() => {
+                const old = btn.innerText; btn.innerText = '✅ XONG'; btn.classList.add('copied');
+                setTimeout(() => { btn.innerText = old; btn.classList.remove('copied'); }, 2000);
+            });
+        }
+
+        async function processText() {
+            const input = document.getElementById('inputText').value;
+            const subIdVal = document.getElementById('subIdInput').value.trim();
+            const btn = document.getElementById('btnConvert');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('loadingSpinner');
+            const list = document.getElementById('productList');
+            
+            if (!input.trim()) return alert('Dán link vào!');
+            
+            btn.disabled = true; 
+            btnText.innerText = 'ĐANG XỬ LÝ...';
+            spinner.style.display = 'block';
+            list.innerHTML = ''; 
+
+            const subIds = subIdVal ? [subIdVal] : [];
+
+            try {
+                const res = await fetch('/api/convert-text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: input, subIds: subIds })
+                });
+                const data = await res.json();
+                if (data.success && data.converted > 0) {
+                    data.details.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'notif-card';
+                        div.innerHTML = `
+                            <div class="result-header">
+                                ${item.imageUrl ? `<img src="${item.imageUrl}" class="product-img">` : '<div class="product-img">🖼️</div>'}
+                                <div class="product-info">
+                                    <div class="product-name">${item.productName}</div>
+                                    <div class="notif-status">✅ Đã chuyển đổi xong</div>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <a href="${item.short}" target="_blank" class="btn-action btn-buy">🛒 MUA NGAY</a>
+                                <button class="btn-action btn-copy" onclick="copyToClipboard('${item.short}', this)">🔗 SAO CHÉP LINK</button>
+                            </div>`;
+                        list.appendChild(div);
+                    });
+                }
+            } catch (e) { alert('Lỗi hệ thống!'); }
+            finally { 
+                btn.disabled = false; 
+                btnText.innerText = 'CHUYỂN ĐỔI NGAY'; 
+                spinner.style.display = 'none';
+            }
+        }
+
+        let clicks = 0;
+        document.getElementById('logoAdmin').onclick = () => { if(++clicks === 5) { document.getElementById('adminSection').style.display='block'; clicks=0; } };
+
+        async function fetchAdminStats() {
+            const secret = document.getElementById('adminSecretInput').value;
+            try {
+                const res = await fetch('/api/admin/stats', { headers: { 'x-admin-token': secret } });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('totalConverted').innerHTML = `Hôm nay: <b style="color:#ee4d2d">${data.total_converted_links} lượt</b>`;
+                    document.getElementById('lastUpdate').innerText = `Cập nhật: ${data.last_updated}`;
+                    let dailyH = '<table style="width:100%; border-top:1px solid #eee; margin-top:10px;">';
+                    if(data.daily) {
+                        Object.keys(data.daily).sort().reverse().slice(0,7).forEach(d => {
+                            dailyH += `<tr><td style="padding:8px 0;">${d}</td><td style="text-align:right; font-weight:800; color:#ee4d2d;">${data.daily[d]} lượt</td></tr>`;
+                        });
+                    }
+                    document.getElementById('dailyHistory').innerHTML = dailyH + '</table>';
+                    document.getElementById('statsContent').style.display = 'block';
+                }
+            } catch(e) { alert('Mật khẩu sai hoặc lỗi kết nối!'); }
+        }
+    </script>
+
+    <div class="contact-section">
+        <h3>💬 Liên hệ & Trợ giúp</h3>
+        <a href="https://zalo.me/g/hxgulu883" target="_blank" class="btn-zalo">Nhóm Zalo Hoàn tiền - Deal Tốt & Mã Giảm Giá</a>
+        <a href="https://zalo.me/84357909268" target="_blank" class="btn-zalo btn-help">Liên hệ & Hỗ trợ gắn mã giảm giá 25%</a>
+    </div>
+
+    <footer>
+        <div style="height:1px; background:linear-gradient(to right, transparent, #d6d1d1, transparent); margin-bottom:20px;"></div>
+        <div class="copyright">© 2026 <a href="https://www.facebook.com/share/18DKD2NyU4/" style="text-decoration:none; color:#ed4d2d;"><b>ANH ĐỨC NGUYỄN</b></a></div>
+    </footer>
+</body>
+</html>
