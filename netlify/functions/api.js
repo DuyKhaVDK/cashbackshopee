@@ -16,7 +16,7 @@ const DB_ROOT = process.env.DB_ROOT;
 const APP_ID = process.env.APP_ID;     
 const APP_SECRET = process.env.APP_SECRET;
 const ADMIN_SECRET = process.env.ADMIN_SECRET; 
-const AFF_ID = "17310280315"; // ID nhận hoa hồng Project B
+const AFF_ID = "17343840387"; // ID nhận hoa hồng Project B
 const SHOPEE_API_URL = 'https://open-api.affiliate.shopee.vn/graphql';
 
 async function resolveAndProcessUrl(inputUrl) {
