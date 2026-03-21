@@ -23,14 +23,12 @@
         textarea { width: 100%; height: 110px; border: 1px solid #efeff4; border-radius: 16px; padding: 15px; font-size: 16px; outline: none; resize: none; background: #fafafa; font-family: inherit; transition: border 0.3s; }
         textarea:focus { border-color: #ee4d2d; background: #fff; }
         
-
         .subid-input { width: 100%; padding: 12px 16px; border: 1px solid #efeff4; border-radius: 12px; font-size: 14px; margin-top: 10px; outline: none; background: #fafafa; font-family: inherit; }
         .subid-input:focus { border-color: #ee4d2d; background: #fff; }
 
         .primary-btn { width: 100%; background: #ee4d2d; color: white; border: none; padding: 18px; border-radius: 50px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 8px 20px rgba(238, 77, 45, 0.25); transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .primary-btn:disabled { opacity: 0.7; }
         
-
         .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; display: none; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -42,12 +40,20 @@
         .product-name { font-size: 15px; font-weight: 700; color: #1c1c1e; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .notif-status { font-size: 13px; font-weight: 600; color: #34c759; display: flex; align-items: center; gap: 4px; }
         
-
         .btn-group { display: flex; gap: 12px; width: 100%; align-items: center; }
         .btn-action { text-decoration: none; padding: 14px 5px; border-radius: 14px; font-size: 14px; font-weight: 800; text-align: center; border: none; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
         .btn-buy { flex: 2; background: #ee4d2d; color: white !important; font-size: 15px; } 
         .btn-copy { flex: 1; background: #f2f2f7; color: #ed4d2d; font-size: 12px; } 
         .btn-copy.copied { background: #34c759; color: white; transform: scale(1.03); }
+
+        /* MỚI: Style nút COPY CODE nhỏ ở footer */
+        .btn-footer-code { 
+            background: #ffffff; color: #ee4d2d; border: 1px solid #ee4d2d; 
+            padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: bold; 
+            cursor: pointer; margin-top: 10px; transition: 0.2s; display: none; /* Ẩn mặc định */
+        }
+        .btn-footer-code:hover { background: #fff5f2; }
+        .btn-footer-code.copied { background: #34c759; color: white; border-color: #34c759; }
         
         .contact-section { width: 100%; max-width: 500px; margin-top: 30px; text-align: center; }
         .btn-zalo { display: block; width: 100%; background: #0068ff; color: white !important; text-decoration: none; padding: 16px; border-radius: 16px; font-size: 15px; font-weight: 700; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0, 104, 255, 0.15); }
@@ -80,7 +86,11 @@
 
     <script>
         async function pasteFromClipboard() { try { const t = await navigator.clipboard.readText(); if(t) document.getElementById('inputText').value = t; } catch(e) {} }
-        function clearInput() { document.getElementById('inputText').value = ''; document.getElementById('productList').innerHTML = ''; }
+        function clearInput() { 
+            document.getElementById('inputText').value = ''; 
+            document.getElementById('productList').innerHTML = ''; 
+            document.getElementById('footerCodeBtn').style.display = 'none'; // Ẩn nút khi xóa
+        }
         function copyToClipboard(url, btn) {
             navigator.clipboard.writeText(url).then(() => {
                 const old = btn.innerText; btn.innerText = '✅ XONG'; btn.classList.add('copied');
@@ -95,13 +105,13 @@
             const btnText = document.getElementById('btnText');
             const spinner = document.getElementById('loadingSpinner');
             const list = document.getElementById('productList');
+            const footerBtn = document.getElementById('footerCodeBtn'); //
             
             if (!input.trim()) return alert('Dán link vào!');
             
-            btn.disabled = true; 
-            btnText.innerText = 'ĐANG XỬ LÝ...';
-            spinner.style.display = 'block';
+            btn.disabled = true; btnText.innerText = 'ĐANG XỬ LÝ...'; spinner.style.display = 'block';
             list.innerHTML = ''; 
+            footerBtn.style.display = 'none'; // Ẩn nút code cũ
 
             const subIds = subIdVal ? [subIdVal] : [];
 
@@ -130,13 +140,13 @@
                             </div>`;
                         list.appendChild(div);
                     });
+                    
+                    // CẬP NHẬT: Hiện nút COPY CODE ở footer và gán link của sản phẩm đầu tiên
+                    footerBtn.style.display = 'inline-block';
+                    footerBtn.onclick = function() { copyToClipboard(data.details[0].shortCode, this); };
                 }
             } catch (e) { alert('Lỗi hệ thống!'); }
-            finally { 
-                btn.disabled = false; 
-                btnText.innerText = 'CHUYỂN ĐỔI NGAY'; 
-                spinner.style.display = 'none';
-            }
+            finally { btn.disabled = false; btnText.innerText = 'CHUYỂN ĐỔI NGAY'; spinner.style.display = 'none'; }
         }
 
         let clicks = 0;
@@ -156,7 +166,8 @@
                             dailyH += `<tr><td style="padding:8px 0;">${d}</td><td style="text-align:right; font-weight:800; color:#ee4d2d;">${data.daily[d]} lượt</td></tr>`;
                         });
                     }
-                    document.getElementById('dailyHistory').innerHTML = dailyH + '</table>';
+                    dailyH += '</table>';
+                    document.getElementById('dailyHistory').innerHTML = dailyH;
                     document.getElementById('statsContent').style.display = 'block';
                 }
             } catch(e) { alert('Mật khẩu sai hoặc lỗi kết nối!'); }
@@ -166,13 +177,27 @@
     <div class="contact-section">
         <h3>💬 Liên hệ & Trợ giúp</h3>
         <a href="https://zalo.me/g/hxgulu883" target="_blank" class="btn-zalo">Nhóm Zalo Hoàn tiền - Deal Tốt & Mã Giảm Giá</a>
-        <a href="https://zalo.me/84357909268" target="_blank" class="btn-zalo btn-help">Liên hệ & Hỗ trợ gắn mã giảm giá 22%</a>       
+        <a href="https://zalo.me/84357909268" target="_blank" class="btn-zalo btn-help">Liên hệ & Hỗ trợ gắn mã giảm giá 25%</a>       
     </div>
-    <img width="500px" height="auto" src="22300k.jpg" alt="">
+    <img width="400px" height="auto" src="251tr.jpg" alt="" style="display:block; margin: 0 auto;">
 
     <footer>
         <div style="height:1px; background:linear-gradient(to right, transparent, #d6d1d1, transparent); margin-bottom:20px;"></div>
-        <div class="copyright">© 2026 <a href="https://www.facebook.com/share/18DKD2NyU4/" style="text-decoration:none; color:#ed4d2d;"><b>ANH ĐỨC NGUYỄN</b></a></div>
+        <div class="copyright">
+            © 2026 <a href="https://www.facebook.com/share/18DKD2NyU4/" style="text-decoration:none; color:#ed4d2d;"><b>ANH ĐỨC NGUYỄN</b></a><br>
+            <button id="footerCodeBtn" class="btn-footer-code">📋 COPY CODE</button>
+        </div>
     </footer>
+
+    <div id="adminSection" style="display:none; width:100%; max-width:500px; margin-top:30px; padding:20px; background:#fff; border-radius:20px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.1); margin-left: auto; margin-right: auto;">
+        <h3>📊 Thống kê lượt chuyển đổi</h3>
+        <input type="password" id="adminSecretInput" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd; text-align:center;" placeholder="Nhập mật khẩu...">
+        <button class="primary-btn" style="margin-top:0; padding:12px;" onclick="fetchAdminStats()">XEM BÁO CÁO</button>
+        <div id="statsContent" style="display:none; text-align:left; margin-top:15px;">
+            <p id="totalConverted"></p>
+            <p id="lastUpdate"></p>
+            <div id="dailyHistory"></div>
+        </div>
+    </div>
 </body>
 </html>
