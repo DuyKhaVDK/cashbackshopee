@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const express = require('express');
 const serverless = require('serverless-http');
@@ -10,13 +9,15 @@ const bodyParser = require('body-parser');
 const app = express();
 const router = express.Router();
 
-
 const DB_ROOT = process.env.DB_ROOT; 
 
 const APP_ID = process.env.APP_ID;     
 const APP_SECRET = process.env.APP_SECRET;
 const ADMIN_SECRET = process.env.ADMIN_SECRET; 
-const AFF_ID = "17343840387"; // ID nhận hoa hồng Project B
+
+const AFF_ID = "17343840387"; // ID chính (Dùng cho nút SAO CHÉP LINK)
+const CODE_AFF_ID = "17308850208"; // ID riêng (Dùng cho nút COPY CODE)
+
 const SHOPEE_API_URL = 'https://open-api.affiliate.shopee.vn/graphql';
 
 async function resolveAndProcessUrl(inputUrl) {
@@ -49,20 +50,21 @@ async function getShopeeProductInfo(itemId) {
     if (!itemId) return null;
     const timestamp = Math.floor(Date.now() / 1000);
     const query = `query { productOfferV2(itemId: ${itemId}) { nodes { productName imageUrl } } }`;
-    const signature = crypto.createHash('sha256').update(`${APP_ID}${timestamp}${JSON.stringify({ query })}${APP_SECRET}`).digest('hex');
+    const payloadString = JSON.stringify({ query });
+    const signature = crypto.createHash('sha256').update(`${APP_ID}${timestamp}${payloadString}${APP_SECRET}`).digest('hex');
     try {
-        const response = await axios.post(SHOPEE_API_URL, JSON.stringify({ query }), {
+        const response = await axios.post(SHOPEE_API_URL, payloadString, {
             headers: { 'Content-Type': 'application/json', 'Authorization': `SHA256 Credential=${APP_ID}, Timestamp=${timestamp}, Signature=${signature}` }
         });
         return response.data.data?.productOfferV2?.nodes?.[0] || null;
     } catch (e) { return null; }
 }
 
-function generateUniversalLink(originalUrl, subIds = []) {
+// CẬP NHẬT: Hàm tạo link hỗ trợ truyền Affiliate ID linh hoạt
+function generateUniversalLink(originalUrl, subIds = [], affId = AFF_ID) {
     const encodedUrl = encodeURIComponent(originalUrl);
-
     let finalSubId = (subIds.length > 0 && subIds[0]) ? subIds.join('-') : "webchuyendoi";
-    return `https://s.shopee.vn/an_redir?origin_link=${encodedUrl}&affiliate_id=${AFF_ID}&sub_id=${finalSubId}`;
+    return `https://s.shopee.vn/an_redir?origin_link=${encodedUrl}&affiliate_id=${affId}&sub_id=${finalSubId}`;
 }
 
 router.post('/convert-text', async (req, res) => {
@@ -75,13 +77,17 @@ router.post('/convert-text', async (req, res) => {
 
     const conversions = await Promise.all(uniqueLinks.map(async (url) => {
         const { cleanedUrl, itemId } = await resolveAndProcessUrl(url.startsWith('http') ? url : `https://${url}`);
-        const [short, info] = await Promise.all([
-            Promise.resolve(generateUniversalLink(cleanedUrl, subIds)),
-            getShopeeProductInfo(itemId)
-        ]);
-        return { original: url, short, productName: info?.productName || "Sản phẩm Shopee", imageUrl: info?.imageUrl || "" };
+        const [info] = await Promise.all([getShopeeProductInfo(itemId)]);
+        
+        // Trả về 2 loại link: Link thường (ID chính) và Link Code (ID riêng)
+        return { 
+            original: url, 
+            short: generateUniversalLink(cleanedUrl, subIds, AFF_ID),
+            shortCode: generateUniversalLink(cleanedUrl, subIds, CODE_AFF_ID),
+            productName: info?.productName || "Sản phẩm Shopee", 
+            imageUrl: info?.imageUrl || "" 
+        };
     }));
-
 
     try {
         const count = conversions.length;
