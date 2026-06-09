@@ -15,7 +15,7 @@ const APP_ID = process.env.APP_ID;
 const APP_SECRET = process.env.APP_SECRET;
 const ADMIN_SECRET = process.env.ADMIN_SECRET; 
 
-const AFF_ID = "17343840387"; // ID chính (Dùng cho nút SAO CHÉP LINK)
+const AFF_ID = "17378730542"; // ID chính (Dùng cho nút SAO CHÉP LINK)
 const CODE_AFF_ID = "17308850208"; // ID riêng (Dùng cho nút COPY CODE)
 
 const SHOPEE_API_URL = 'https://open-api.affiliate.shopee.vn/graphql';
